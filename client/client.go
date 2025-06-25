@@ -43,6 +43,7 @@ type Config struct {
 	TLS              TLSConfig
 	DialContext      func(ctx context.Context, network, addr string) (net.Conn, error)
 	Verbose          bool
+	ProtocolVersion  string
 }
 
 // TLSConfig for a Client
@@ -71,6 +72,9 @@ type Client struct {
 
 // NewClient creates a new client instance
 func NewClient(c *Config) (*Client, error) {
+	if c.ProtocolVersion != "" {
+		chshare.ProtocolVersion = c.ProtocolVersion
+	}
 	//apply default scheme
 	if !strings.HasPrefix(c.Server, "http") {
 		c.Server = "http://" + c.Server

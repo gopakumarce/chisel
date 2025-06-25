@@ -174,6 +174,9 @@ var serverHelp = `
     holding multiple PEM encode CA certificate bundle files, which is used to 
     validate client connections. The provided CA certificates will be used 
     instead of the system roots. This is commonly used to implement mutual-TLS. 
+
+	--protocol-version, instead of the standard chisel-v3, we can specifiy
+	for example 2.0-OpenSSH_7.2p2
 ` + commonHelp
 
 func server(args []string) {
@@ -194,6 +197,7 @@ func server(args []string) {
 	flags.StringVar(&config.TLS.Cert, "tls-cert", "", "")
 	flags.Var(multiFlag{&config.TLS.Domains}, "tls-domain", "")
 	flags.StringVar(&config.TLS.CA, "tls-ca", "", "")
+	flags.StringVar(&config.ProtocolVersion, "protocol-version", "", "")
 
 	host := flags.String("host", "", "")
 	p := flags.String("p", "", "")
@@ -215,6 +219,9 @@ func server(args []string) {
 		return
 	}
 
+	if config.ProtocolVersion != "" {
+		chshare.ProtocolVersion = config.ProtocolVersion
+	}
 	if config.KeySeed != "" {
 		log.Print("Option `--key` is deprecated and will be removed in a future version of chisel.")
 		log.Print("Please use `chisel server --keygen /file/path`, followed by `chisel server --keyfile /file/path` to specify the SSH private key")

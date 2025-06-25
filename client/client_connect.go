@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 	"time"
 
@@ -76,13 +77,16 @@ func (c *Client) connectionOnce(ctx context.Context) (connected bool, err error)
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	//prepare dialer
+	headers := http.Header{}
+	headers.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:130.0) Gecko/20100101 Firefox/130.0")
 	d := websocket.Dialer{
-		HandshakeTimeout: settings.EnvDuration("WS_TIMEOUT", 45*time.Second),
-		Subprotocols:     []string{chshare.ProtocolVersion},
-		TLSClientConfig:  c.tlsConfig,
-		ReadBufferSize:   settings.EnvInt("WS_BUFF_SIZE", 0),
-		WriteBufferSize:  settings.EnvInt("WS_BUFF_SIZE", 0),
-		NetDialContext:   c.config.DialContext,
+		HandshakeTimeout:   settings.EnvDuration("WS_TIMEOUT", 45*time.Second),
+		Subprotocols:       []string{chshare.ProtocolVersion},
+		TLSClientConfig:    c.tlsConfig,
+		ReadBufferSize:     settings.EnvInt("WS_BUFF_SIZE", 0),
+		WriteBufferSize:    settings.EnvInt("WS_BUFF_SIZE", 0),
+		NetDialContext:     c.config.DialContext,
+		ProxyConnectHeader: headers,
 	}
 	//optional proxy
 	if p := c.proxyURL; p != nil {
