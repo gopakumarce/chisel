@@ -118,7 +118,9 @@ func NewClient(c *Config) (*Client, error) {
 		}
 		//certificate verification config
 		if c.TLS.SkipVerify {
-			client.Infof("TLS verification disabled")
+			if client.config.Verbose {
+				client.Infof("TLS verification disabled")
+			}
 			tc.InsecureSkipVerify = true
 		} else if c.TLS.CA != "" {
 			rootCAs := x509.NewCertPool()
