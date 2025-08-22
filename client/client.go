@@ -68,6 +68,7 @@ type Client struct {
 	stop      func()
 	eg        *errgroup.Group
 	tunnel    *tunnel.Tunnel
+	Connected chan error
 }
 
 // NewClient creates a new client instance
@@ -193,6 +194,8 @@ func NewClient(c *Config) (*Client, error) {
 		Socks:     hasReverse && hasSocks,
 		KeepAlive: client.config.KeepAlive,
 	})
+
+	client.Connected = make(chan error)
 	return client, nil
 }
 

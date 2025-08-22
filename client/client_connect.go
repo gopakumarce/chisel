@@ -18,6 +18,13 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+func (c *Client) connectionStatusNotify(err error) {
+	select {
+	case c.Connected <- err:
+	default:
+	}
+}
+
 func (c *Client) connectionLoop(ctx context.Context) error {
 	//connection loop!
 	b := &backoff.Backoff{Max: c.config.MaxRetryInterval}
@@ -26,6 +33,7 @@ func (c *Client) connectionLoop(ctx context.Context) error {
 		//reset backoff after successful connections
 		if connected {
 			b.Reset()
+			c.connectionStatusNotify(nil)
 		}
 		//connection error
 		attempt := int(b.Attempt())
@@ -49,6 +57,7 @@ func (c *Client) connectionLoop(ctx context.Context) error {
 		//give up?
 		if maxAttempt >= 0 && attempt >= maxAttempt {
 			c.Infof("Give up")
+			c.connectionStatusNotify(err)
 			break
 		}
 		d := b.Duration()
