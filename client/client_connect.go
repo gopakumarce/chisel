@@ -33,7 +33,6 @@ func (c *Client) connectionLoop(ctx context.Context) error {
 		//reset backoff after successful connections
 		if connected {
 			b.Reset()
-			c.connectionStatusNotify(nil)
 		}
 		//connection error
 		attempt := int(b.Attempt())
@@ -139,6 +138,7 @@ func (c *Client) connectionOnce(ctx context.Context) (connected bool, err error)
 		return false, errors.New(string(configerr))
 	}
 	c.Infof("Connected (Latency %s)", time.Since(t0))
+	c.connectionStatusNotify(nil)
 	//connected, handover ssh connection for tunnel to use, and block
 	err = c.tunnel.BindSSH(ctx, sshConn, reqs, chans)
 	c.Infof("Disconnected")
