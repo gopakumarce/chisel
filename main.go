@@ -425,6 +425,9 @@ var clientHelp = `
     --tls-cert, a path to a PEM encoded certificate matching the provided 
     private key. The certificate must have client authentication 
     enabled (mutual-TLS).
+
+	--protocol-version, instead of the standard chisel-v3, we can specifiy
+	for example 2.0-OpenSSH_7.2p2
 ` + commonHelp
 
 func client(args []string) {
@@ -441,6 +444,7 @@ func client(args []string) {
 	flags.StringVar(&config.TLS.Cert, "tls-cert", "", "")
 	flags.StringVar(&config.TLS.Key, "tls-key", "", "")
 	flags.Var(&headerFlags{config.Headers}, "header", "")
+	flags.StringVar(&config.ProtocolVersion, "protocol-version", "", "")
 	hostname := flags.String("hostname", "", "")
 	sni := flags.String("sni", "", "")
 	pid := flags.Bool("pid", false, "")
